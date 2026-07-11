@@ -9,6 +9,15 @@
  */
 {
   "sections": {
+    "custom_full_width_banner_Ha63Wc": {
+      "type": "custom-full-width-banner",
+      "name": "Custom Full Width Banner",
+      "settings": {
+        "image_desktop": "shopify://shop_images/WhatsApp_Image_2026-06-30_at_10.26.17_AM.jpg",
+        "image_mobile": "shopify://shop_images/WhatsApp_Image_2026-07-01_at_4.12.30_PM.jpg",
+        "link": ""
+      }
+    },
     "custom_video_J8VNzb": {
       "type": "custom-video",
       "disabled": true,
@@ -405,81 +414,6 @@
         "color_scheme": "scheme-45796c1a-85bf-48ad-aabf-cc6040ab33cf",
         "padding_top": 0,
         "padding_bottom": 0,
-        "padding_rate": 50
-      }
-    },
-    "custom_section_p3f9Bb": {
-      "type": "custom-section",
-      "blocks": {
-        "image_BXxU8V": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/Needle_Icon-01_1.png",
-            "link": "",
-            "image_width": "custom",
-            "width": 80,
-            "width_mb": 70,
-            "alignment": "center"
-          }
-        },
-        "heading_NgrLfe": {
-          "type": "heading",
-          "settings": {
-            "heading": "Woven with Legacy, Worn as Heirlooms",
-            "heading_color": "",
-            "tag": "h2",
-            "heading_size": "h4",
-            "alignment": "center"
-          }
-        },
-        "heading_WXbRjF": {
-          "type": "heading",
-          "settings": {
-            "heading": "Kalatantu, meaning ‘a thread of art’ in Sanskrit, celebrates India’s timeless textile heritage and honors the artisans who preserve these traditional crafts.",
-            "heading_color": "#dd816a",
-            "tag": "h2",
-            "heading_size": "h5",
-            "alignment": "center"
-          }
-        },
-        "button_kwLMNX": {
-          "type": "button",
-          "settings": {
-            "btn_label": "KNOW MORE",
-            "btn_link": "shopify://pages/about-us",
-            "target": false,
-            "btn_size": "base",
-            "btn_style": "link",
-            "btn_fw": "medium",
-            "btn_icon": "none",
-            "alignment": "center",
-            "link_color": "#dd816a"
-          }
-        }
-      },
-      "block_order": [
-        "image_BXxU8V",
-        "heading_NgrLfe",
-        "heading_WXbRjF",
-        "button_kwLMNX"
-      ],
-      "disabled": true,
-      "custom_css": [
-        ".hdt-btn {color: #dd816a !important;}",
-        ".hdt-btn::after {background-color: #dd816a !important;}"
-      ],
-      "name": "t:sections.custom_section.name",
-      "settings": {
-        "section_fullwidth": false,
-        "small_container": false,
-        "short_container": true,
-        "color_scheme": "scheme-d0277fdd-d8cb-438f-9516-8c1532927e02",
-        "direction": "",
-        "justify": "hdt-justify-center",
-        "gap": false,
-        "space": 0,
-        "padding_top": 72,
-        "padding_bottom": 40,
         "padding_rate": 50
       }
     },
@@ -2198,6 +2132,7 @@
     }
   },
   "order": [
+    "custom_full_width_banner_Ha63Wc",
     "custom_video_J8VNzb",
     "multi_slideshow_3GTNYd",
     "custom_section_MpeP69",
@@ -2205,7 +2140,6 @@
     "1772169553cb537b86",
     "top_heading_airPnR",
     "slideshow_with_banner_C8epWE",
-    "custom_section_p3f9Bb",
     "image_with_text_cJVLP4",
     "image_with_text_PfBQHj",
     "custom_section_HLrDYQ",
