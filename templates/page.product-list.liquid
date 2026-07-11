@@ -1,0 +1,127 @@
+<!-- products-list.liquid -->
+{{ 'hdt-collections-list.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+assign current_width = settings.page_width | append: 'px'
+assign current_width_tb = '100vw'
+assign current_width_mb = '100vw'
+assign space_item = "30px"
+assign space_item_tb = "15px"
+assign space_item_mb = "15px" 
+
+if section.settings.section_fullwidth
+  if section.settings.boxed_fullwidth
+    assign current_width = '100vw - 80px'
+    assign current_width_tb = '100vw - 40px'
+    assign current_width_mb = '100vw - 10px'
+  else
+    assign current_width = '100vw'
+  endif
+endif
+assign has_view_all = section.blocks | where: "type", 'view_all'
+assign collections_list = section.blocks | where: "type", 'collection_item'
+-%}
+
+{%- capture sizes -%}
+  (min-width: 1150px) calc(({{ current_width }} -  ({{ space_item }} * ( {{ section.settings.col_dk }} - 1 ))) * 1 / {{ section.settings.col_dk }}),(min-width: 768px) calc( ({{ current_width_tb }} - ({{ space_item_tb }} * ( {{ section.settings.col_tb }} - 1 ))) * 1 / {{ section.settings.col_tb }}), calc( ({{ current_width_mb }} - ({{ space_item_mb }} * ( {{ section.settings.col_mb }} - 1 ) )) * 1 / {{ section.settings.col_mb }})
+{%- endcapture -%}
+{%- style -%}{%- if section.settings.space_items !="x" -%}.hdt-collection-list-wrap{--spacing-x:{{section.settings.space_items}}px}{%- endif -%} {% if section.settings.collection_des=="5" %} #{{section.id}} .hdt-slider-collections{--slide-spacing:15px} @media(min-width:768px){ #{{section.id}} .hdt-slider-collections{--slide-spacing:30px}} @media(min-width:1150px){ #{{section.id}}  .hdt-slider-collections{--slide-spacing:50px}}{% endif %} {% if section.settings.content_padding>30 %}#{{section.id}}  .hdt-collection-list-wrap{--content-pd:15px}#{{section.id}}  .hdt-collection-list-wrap .hdt-slider-parent.hdt-slider__dots_on_content{--content-pd:26px}@media(min-width:768px){#{{section.id}}  .hdt-collection-list-wrap{--content-pd:30px}#{{section.id}}  .hdt-collection-list-wrap .hdt-slider-parent.hdt-slider__dots_on_content{--content-pd:{{section.settings.content_padding}}px}}@media(min-width:1150px){#{{section.id}}  .hdt-collection-list-wrap{--content-pd:{{section.settings.content_padding}}px}}{% elsif section.settings.content_padding>15 %}#{{section.id}}  .hdt-collection-list-wrap{--content-pd:15px}#{{section.id}}  .hdt-collection-list-wrap .hdt-slider-parent.hdt-slider__dots_on_content{--content-pd:{{section.settings.content_padding}}px}@media(min-width:768px){#{{section.id}}  .hdt-collection-list-wrap{--content-pd:{{section.settings.content_padding}}px}}{% else %}#{{section.id}}  .hdt-collection-list-wrap{--content-pd:{{section.settings.content_padding}}px}{% endif %}{% if section.settings.boxed_fullwidth %}{% if section.settings.half_item %}#{{section.id}}  .hdt-container-full{padding-inline-start:15px}#{{section.id}}  .hdt-container-full.hdt-container-heading{padding-inline-end:15px}@media(min-width:768px){#{{section.id}}  .hdt-container-full{padding-inline-start:30px}#{{section.id}}  .hdt-container-full.hdt-container-heading{padding-inline-end:30px}}@media(min-width:1150px){#{{section.id}}  .hdt-container-full{padding-inline-start:40px}#{{section.id}}  .hdt-container-full.hdt-container-heading{padding-inline-end:40px}}{% else %}#{{section.id}}  .hdt-container-full{padding-inline-start:15px;padding-inline-end:15px}@media(min-width:768px){#{{section.id}}  .hdt-container-full{padding-inline-start:30px;padding-inline-end:30px}}@media(min-width:1150px){#{{section.id}}  .hdt-container-full{padding-inline-start:40px;padding-inline-end:40px}}{% endif %}{% endif %}@media(max-width:1149px){.hdt-container-full.lg\:hdt-ps-max{max-width:var(--container-max-width-padding-md);padding-inline-start:3rem}}@media(max-width:767px){.hdt-container-full.lg\:hdt-ps-max{max-width:100vw;padding-inline-start:1.5rem}{%- if section.settings.half_item -%}#{{section.id}}  .hdt-container-full .hdt-view-all-item{max-width:calc(100% - 15px)}{%- endif -%}}{%- endstyle -%}
+<div id="{{ section.id }}" class="category-section why-kalatantu-section hdt-section-spacing hdt-s-gradient {% if section.settings.boxed_content %}hdt-boxed_content_true{% endif %}" style="--section-pt: {{ section.settings.padding_top }}px; --section-pb: {{ section.settings.padding_bottom }}px; --section-prate:{{ section.settings.padding_rate }};" color-scheme="{{ section.settings.color_scheme }}">
+  <div class="hdt-container{%- if section.settings.section_fullwidth -%}-full{% endif %} hdt-container-heading">
+    {%- render 'section-top-head' -%}
+  </div>
+  <div class="hdt-container{%- if section.settings.section_fullwidth -%}-full {% else %}{% if section.settings.half_item %}-full lg:hdt-ps-max {% endif %}{% endif %}">
+    <div class="hdt-flex hdt-collection-list-wrap hdt-boxed_content hdt-ratio--{{ section.settings.image_ratio }} {% unless section.settings.image_size %} hdt-ratio--contain{% endunless %}">
+      <div class="{% if has_view_all.size > 0 %}hdt-custom-col-12 md:hdt-custom-col-8 lg:hdt-custom-col-9{% else %}hdt-custom-col-12{% endif %}">
+        <hdt-slider id="Slider-{{ section.id }}" class="hdt-slider-collections hdt-has-collection{{ section.settings.collection_des }} hdt-slider hdt-slider-parent {% if section.settings.half_item %}hdt-slider-has-half_item{% endif %} hdt-slide-spacing-{{ section.settings.space_items }} hdt-relative {% if section.settings.navUI %}hdt-slider-has-nav hdt-nav-btns-{{ section.settings.nav_des }} hdt-nav-{{ section.settings.nav_pos }}{% endif %} {% if section.settings.dotUI %}hdt-slider-has-dots-dk hdt-slider__dots_{{ section.settings.dots_pos }}{% endif %} hdt-slider__dots_outline hdt-text-uppercase-{{ section.settings.text_transform }} lg:hdt-slides-{{ section.settings.col_dk }} md:hdt-slides-{{ section.settings.col_tb }} hdt-slides-{{ section.settings.col_mb }}" config='{ "id": "Slider-{{ section.id }}", "navUI": {{ section.settings.navUI }}, "dotUI": true, "navUICenter": true }'>
+          <div class="hdt-slider__viewport hdt-relative">
+            <div class="hdt-slider__container">
+              {%- liquid 
+                if section.settings.collection_list != blank
+                  case section.settings.collection_des
+                    when '1'
+                      for collection in section.settings.collection_list
+                        capture current 
+                          cycle 1, 2, 3, 4
+                        endcapture
+                        render 'collection_item1', collection: collection, class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                    when '2'
+                      for collection in section.settings.collection_list
+                        capture current 
+                          cycle 1, 2, 3, 4 
+                        endcapture
+                        render 'collection_item2', collection: collection, class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                    when '3' or '4' or '5' or '6' or '7' or '8'
+                      for collection in section.settings.collection_list
+                        capture current
+                          cycle 1, 2, 3, 4
+                        endcapture
+                        render 'collection_item3', collection: collection, class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                  endcase
+                elsif section.settings.collection_list == blank and collections_list.size > 0
+                  case section.settings.collection_des  
+                    when '1'
+                      for block in collections_list
+                        capture current
+                          cycle 1, 2, 3, 4
+                        endcapture
+                        render 'collection_item1', block: block, collection: collections[block.settings.collection], class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                    when '2'
+                      for block in collections_list
+                        capture current
+                          cycle 1, 2, 3, 4
+                        endcapture
+                        render 'collection_item2', block: block, collection: collections[block.settings.collection], class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                    when '3' or '4' or '5' or '6' or '7' or '8'
+                      for block in collections_list
+                        capture current
+                          cycle 1, 2, 3, 4
+                        endcapture
+                        render 'collection_item3', block: block, collection: collections[block.settings.collection], class: "hdt-slider__slide", sizes: sizes, current: current
+                      endfor
+                  endcase
+                else
+                  for i in (1..8)
+                    capture current
+                      cycle 1, 2, 3, 4
+                    endcapture
+                    render 'collection_item1', class: "hdt-slider__slide", sizes: sizes, current: current
+                  endfor
+                endif -%}
+            </div>
+          </div>
+          {%- if section.settings.nav_pos == "middle_in" or section.settings.nav_pos == "middle_out" -%}
+            {%- render 'nav_slider', nav_des: section.settings.nav_des -%}
+          {%- endif -%}
+          <div hdt-slider-dots class="hdt-slider__dots hdt-flex hdt-align-center hdt-justify-center no-js-hidden" aria-controls="Slider-{{ section.id }}"></div>
+        </hdt-slider>
+      </div>
+      {%- if has_view_all.size > 0 -%}
+        <div class="hdt-custom-col-12 md:hdt-custom-col-4 lg:hdt-custom-col-3">
+          {%- for block in section.blocks -%}
+            {%- if block.type == "view_all" -%}
+              <div class="hdt-view-all-item">
+                <div class="hdt-collection-inner hdt-relative hdt-oh hdt-grid">
+                  <div class="hdt-collection-content hdt-relative hdt-place-self-end-start">
+                    {%- if block.settings.title != blank -%}
+                      <h6 class="hdt-block-title hdt-text-10xl">{{ block.settings.title }}</h6> 
+                    {%- endif -%}
+                    {%- if block.settings.item_link != blank -%}
+                      <a class="hdt-view-all-btn hdt-inline-flex hdt-align-center hdt-justify-center hdt-text-xl hdt-font-medium hdt-rounded-full" href="{{ block.settings.item_link }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.07692 10L0 8.92308L7.38462 1.53846H0.769231V0H10V9.23077H8.46154V2.61538L1.07692 10Z" fill="currentColor"/></svg></a>
+                    {%- endif -%}
+                  </div>
+                </div>
+              </div> 
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>

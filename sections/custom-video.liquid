@@ -1,0 +1,49 @@
+{% schema %}
+{
+  "name": "Custom Video (HQ)",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video_desktop",
+      "label": "Desktop Video"
+    },
+    {
+      "type": "video",
+      "id": "video_mobile",
+      "label": "Mobile Video"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Video (HQ)"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+.custom-video-wrapper{width:100%;overflow:hidden}
+.custom-video-wrapper video{width:100%;height:auto;display:block}
+.video-desktop{display:block}
+.video-mobile{display:none}
+@media(max-width:768px){
+.video-desktop{display:none}
+.video-mobile{display:block}
+}
+</style>
+
+<div class="custom-video-wrapper">
+
+  {% if section.settings.video_desktop != blank %}
+    <div class="video-desktop">
+      {{ section.settings.video_desktop | video_tag: autoplay: true, loop: true, muted: true, controls: false }}
+    </div>
+  {% endif %}
+
+  {% if section.settings.video_mobile != blank %}
+    <div class="video-mobile">
+      {{ section.settings.video_mobile | video_tag: autoplay: true, loop: true, muted: true, controls: false }}
+    </div>
+  {% endif %}
+
+</div>

@@ -1,0 +1,234 @@
+<section class="bridal-grid-section">
+  <div class="bridal-container">
+    {% if section.settings.section_heading != blank %}
+      <div class="bridal-heading">
+        <h2>{{ section.settings.section_heading }}</h2>
+      </div>
+    {% endif %}
+
+    <div class="bridal-grid">
+      <a href="{{ section.settings.left_collection.url }}" class="tile tile-left">
+        <img src="{{ section.settings.left_image | image_url: width: 1200 }}">
+        <span>{{ section.settings.left_heading }}</span>
+      </a>
+
+      <a href="{{ section.settings.center_top_collection.url }}" class="tile tile-center-top">
+        <img src="{{ section.settings.center_top_image | image_url: width: 900 }}">
+        <span>{{ section.settings.center_top_heading }}</span>
+      </a>
+
+      <a href="{{ section.settings.center_bottom_collection.url }}" class="tile tile-center-bottom">
+        <img src="{{ section.settings.center_bottom_image | image_url: width: 900 }}">
+        <span>{{ section.settings.center_bottom_heading }}</span>
+      </a>
+
+      <a href="{{ section.settings.right_top_collection.url }}" class="tile tile-right-top">
+        <img src="{{ section.settings.right_top_image | image_url: width: 900 }}">
+        <span>{{ section.settings.right_top_heading }}</span>
+      </a>
+
+      <a href="{{ section.settings.right_bottom_left_collection.url }}" class="tile tile-right-bottom-left">
+        <img src="{{ section.settings.right_bottom_left_image | image_url: width: 700 }}">
+        <span>{{ section.settings.right_bottom_left_heading }}</span>
+      </a>
+
+      <a href="{{ section.settings.right_bottom_right_collection.url }}" class="tile tile-right-bottom-right">
+        <img src="{{ section.settings.right_bottom_right_image | image_url: width: 700 }}">
+        <span>{{ section.settings.right_bottom_right_heading }}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* --- BASE & DESKTOP STYLES (UNCHANGED) --- */
+.bridal-container {
+  padding: 40px;
+}
+
+.bridal-heading {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.bridal-heading h2 {
+  font-size: 29px;
+  font-weight: 400;
+}
+
+.bridal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 320px 320px;
+  gap: 16px;
+}
+
+.tile-left {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.tile-center-top {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.tile-center-bottom {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.tile-right-top {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* Desktop Right Bottom Logic */
+.tile-right-bottom-left {
+  grid-column: 3;
+  grid-row: 2;
+  width: calc(50% - 8px);
+}
+
+.tile-right-bottom-right {
+  grid-column: 3;
+  grid-row: 2;
+  margin-left: calc(50% + 8px);
+  width: calc(50% - 8px);
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: .4s;
+}
+
+.tile:hover img {
+  transform: scale(1.05);
+}
+
+.tile span {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  font-size: 20px;
+  font-weight: 500;
+  z-index: 2;
+}
+
+/* --- MOBILE VERSION (70/30 SPLIT & EXACT DIMENSIONS) --- */
+@media (max-width: 768px) {
+  .bridal-container {
+    padding: 20px 12px;
+  }
+
+  .bridal-grid {
+    display: grid;
+    /* 4 columns allows us to do 50% (2 cols) and 25% (1 col) easily */
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto; 
+    gap: 8px;
+  }
+
+  /* --- TOP SECTION (70%) --- */
+  
+  /* Left Image: 50% Width, H 485.7 */
+  .tile-left {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    height: 485.7px;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* Center Top: 50% Width, H 242.8 */
+  .tile-center-top {
+    grid-column: 3 / span 2;
+    grid-row: 1;
+    height: 242.8px;
+    align-self: start;
+    width: 100%;
+  }
+
+  /* Center Bottom: 50% Width, H 226.8 */
+  .tile-center-bottom {
+    grid-column: 3 / span 2;
+    grid-row: 1;
+    height: 226.8px;
+    align-self: end; /* Pushes it to the bottom of the first row area */
+    width: 100%;
+  }
+
+  /* --- BOTTOM SECTION (30%) --- */
+
+  /* Right Top Image: 50% Width, H 182.6 */
+  .tile-right-top {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    height: 182.6px;
+    width: 100%;
+  }
+
+  /* Right Bottom Left: 25% Width, H 182.6 */
+  .tile-right-bottom-left {
+    grid-column: 3 / span 1;
+    grid-row: 2;
+    height: 182.6px;
+    width: 100%;
+    margin-left: 0; /* Reset desktop margin */
+  }
+
+  /* Right Bottom Right: 25% Width, H 182.6 */
+  .tile-right-bottom-right {
+    grid-column: 4 / span 1;
+    grid-row: 2;
+    height: 182.6px;
+    width: 100%;
+    margin-left: 0; /* Reset desktop margin */
+  }
+
+  /* Mobile Typography */
+  .tile span {
+    font-size: 11px;
+    bottom: 10px;
+    left: 10px;
+    font-weight: 600;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Bridal Event Grid",
+  "settings": [
+    { "type": "text", "id": "section_heading", "label": "Section Heading" },
+    { "type": "image_picker", "id": "left_image", "label": "Left Image" },
+    { "type": "collection", "id": "left_collection", "label": "Left Collection" },
+    { "type": "text", "id": "left_heading", "label": "Left Heading" },
+    { "type": "image_picker", "id": "center_top_image", "label": "Center Top Image" },
+    { "type": "collection", "id": "center_top_collection", "label": "Center Top Collection" },
+    { "type": "text", "id": "center_top_heading", "label": "Center Top Heading" },
+    { "type": "image_picker", "id": "center_bottom_image", "label": "Center Bottom Image" },
+    { "type": "collection", "id": "center_bottom_collection", "label": "Center Bottom Collection" },
+    { "type": "text", "id": "center_bottom_heading", "label": "Center Bottom Heading" },
+    { "type": "image_picker", "id": "right_top_image", "label": "Right Top Image" },
+    { "type": "collection", "id": "right_top_collection", "label": "Right Top Collection" },
+    { "type": "text", "id": "right_top_heading", "label": "Right Top Heading" },
+    { "type": "image_picker", "id": "right_bottom_left_image", "label": "Right Bottom Left Image" },
+    { "type": "collection", "id": "right_bottom_left_collection", "label": "Right Bottom Left Collection" },
+    { "type": "text", "id": "right_bottom_left_heading", "label": "Right Bottom Left Heading" },
+    { "type": "image_picker", "id": "right_bottom_right_image", "label": "Right Bottom Right Image" },
+    { "type": "collection", "id": "right_bottom_right_collection", "label": "Right Bottom Right Collection" },
+    { "type": "text", "id": "right_bottom_right_heading", "label": "Right Bottom Right Heading" }
+  ],
+  "presets": [{ "name": "Bridal Event Grid" }]
+}
+{% endschema %}

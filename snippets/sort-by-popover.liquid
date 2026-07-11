@@ -1,0 +1,56 @@
+{%- comment -%}
+  Renders sort by popover
+
+  Accepts:
+  - results: {Object} Collection or Search object (required)
+  - section_id: {String} The ID of the section that contains this card. (required)
+
+  Usage:
+  {%- render 'sort-by-popover', results: collection -%}
+{%- endcomment -%}
+
+{%- liquid
+  assign sort_by = results.sort_by
+  if sort_by == blank
+    assign sort_by = results.sort_options.first.value
+  endif
+  assign option_selected = results.sort_options | where: "value", sort_by | first
+  assign id = results.id | default: 'main_6868'
+-%}
+
+
+<hdt-popover-sorting class="hdt-popover__sorting" section-id="{{ section_id }}">
+  <button aria-controls="dropdown{{ id }}" aria-owns="listbox{{ id }}" class="hdt-flex hdt-align-center hdt-justify-between">
+    <span class="md:hdt-block hdt-hidden" change-text>{{ option_selected.name }}</span>
+    <span class="hdt-block md:hdt-hidden">{{ 'sections.collection_template.short_by_txt' | t -}}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="7" viewBox="0 0 12 7" fill="none">
+      <path d="M0.738281 1.23813L6.23828 6.73813L11.7383 1.23813L10.762 0.261879L6.23828 4.78563L1.71453 0.261879L0.738281 1.23813Z" fill="currentColor"/>
+    </svg>
+  </button>
+  <hdt-popover class="hdt-popover hdt-dropdown hdt-hidden hdt-collection-sorting" id="dropdown{{ id }}" placement="bottom" color-scheme="{{ settings.color_scheme_dialog }}" config='{ "closeRichlistSelect": true }'>
+      <p slot="header" class="hdt-s-text">{{ 'products.facets.sort_by_label' | t }}</p>
+      <hdt-richlist role="listbox" selected="{{ option_selected.value }}" id="listbox{{ id }}">
+
+        <button type="button" role="option" value="manual" aria-selected="{% if sort_by == 'manual' %}true{% else %}false{% endif %}">
+  <span>Featured</span>
+</button>
+{% if template.name != 'search' %}
+  <button type="button" role="option" value="created-descending" aria-selected="{% if sort_by == 'created-descending' %}true{% else %}false{% endif %}">
+    <span>New Arrival</span>
+  </button>
+{% endif %}
+
+<!-- <button type="button" role="option" value="created-descending" aria-selected="{% if sort_by == 'created-descending' %}true{% else %}false{% endif %}">
+  <span>New Arrival</span>
+</button> -->
+<button type="button" role="option" value="price-descending" aria-selected="{% if sort_by == 'price-descending' %}true{% else %}false{% endif %}">
+  <span>Price: High to Low</span>
+</button>
+<button type="button" role="option" value="price-ascending" aria-selected="{% if sort_by == 'price-ascending' %}true{% else %}false{% endif %}">
+  <span>Price: Low to High</span>
+</button>
+
+
+      </hdt-richlist>
+  </hdt-popover>
+</hdt-popover-sorting>

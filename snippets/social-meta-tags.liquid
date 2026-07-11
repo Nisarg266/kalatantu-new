@@ -1,0 +1,197 @@
+{%- if request.page_type == 'index' -%}
+  <title>Handcrafted GI-Tagged Sarees, Suits & Ethnic Wear Online | Kalatantu</title>
+  <meta
+    name="keywords"
+    content="GI tagged ethnic wear, Banarasi collection, Chikankari suits, Handloom sarees, Handweave dupattas, Indian anarkalis, Co-ord sets for women, Ethnic shirts, Traditional Indian pants, Kalatantu handcrafted fashion"
+  >
+  <meta name="author" content="Kalatantu">
+  <meta name="robots" content="index, follow">
+  <meta
+    name="description"
+    content="Explore GI tagged handloom and handweave collections at Kalatantu. Shop Banarasi and Chikankari sarees, anarkalis, suits, dupattas, co-ord sets, pants, and shirts—crafted with traditional Indian artistry and fine craftsmanship."
+  >
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Handcrafted GI-Tagged Sarees, Suits & Ethnic Wear Online | Kalatantu">
+  <meta
+    property="og:description"
+    content="Explore GI tagged handloom and handweave collections at Kalatantu. Shop Banarasi and Chikankari sarees, anarkalis, suits, dupattas, co-ord sets, pants, and shirts—crafted with traditional Indian artistry and fine craftsmanship."
+  >
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ shop.url }}">
+  <meta
+    property="og:image"
+    content="https://cdn.shopify.com/s/files/1/0744/4774/9335/files/Kalatantu_OG_Image_fefbf4e7-5c5a-4ab4-8df1-bd698d18d7c9.jpg?v=1750685593"
+  >
+  <meta
+    property="og:image:secure_url"
+    content="https://cdn.shopify.com/s/files/1/0744/4774/9335/files/Kalatantu_OG_Image_fefbf4e7-5c5a-4ab4-8df1-bd698d18d7c9.jpg?v=1750685593"
+  >
+  <meta property="og:image:width" content="430">
+  <meta property="og:image:height" content="400">
+  <meta property="og:site_name" content="Kalatantu">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Handcrafted GI-Tagged Sarees, Suits & Ethnic Wear Online | Kalatantu">
+  <meta
+    name="twitter:description"
+    content="Explore GI tagged handloom and handweave collections at Kalatantu. Shop Banarasi and Chikankari sarees, anarkalis, suits, dupattas, co-ord sets, pants, and shirts—crafted with traditional Indian artistry and fine craftsmanship."
+  >
+  <meta
+    name="twitter:image"
+    content="https://cdn.shopify.com/s/files/1/0744/4774/9335/files/Kalatantu_OG_Image_fefbf4e7-5c5a-4ab4-8df1-bd698d18d7c9.jpg?v=1750685593"
+  >
+
+{%- elsif request.page_type == 'product' and product -%}
+  {% assign seo_keywords = product.metafields.custom.seo_keywords %}
+  
+{% if product.metafields.custom.about_product != blank %}
+  {%- assign og_description = product.metafields.custom.about_product
+    | metafield_text
+    | strip
+    | truncate: 200
+    | escape -%}
+
+{% elsif product.metafields.custom.og_description != blank %}
+  {%- assign og_description = product.metafields.custom.og_description
+    | strip_html
+    | truncate: 100
+    | escape -%}
+
+{% else %}
+  {%- assign og_description = product.description
+    | strip_html
+    | truncate: 200
+    | escape -%}
+{% endif %}
+  {% assign og_image = product.featured_image %}
+  <title>{{ page_title | escape }}</title>
+  <meta name="title" content="{{ page_title | escape }}">
+  <meta name="description" content="{{ page_description | escape }}">
+  {% if seo_keywords != blank %}
+    <meta name="keywords" content="{{ seo_keywords }}">
+  {% endif %}
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="Kalatantu">
+  <meta property="og:url" content="{{ shop.url }}{{ product.url }}">
+  <meta property="og:title" content="{{ page_title | escape }}">
+  <meta property="og:description" content="{{ og_description | strip_html | truncate: 300 }}">
+  <meta property="og:type" content="product">
+
+
+  {% if og_image %}
+    <meta property="og:image" content="https:{{ og_image | image_url: width: 400 }}">
+    <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 400 }}">
+  {% endif %}
+  <meta
+    property="og:price:amount"
+    content="{{ product.selected_or_first_available_variant.price | money_without_currency }}"
+  >
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page_title | escape }}">
+  <meta name="twitter:description" content="{{ product.description | strip_html | truncate: 300 }}">
+  {% if og_image %}
+    <meta name="twitter:image" content="{{ og_image | image_url: width: 400 }}">
+  {% endif %}
+  {% if settings.social_twitter_link != blank %}
+    <meta name="twitter:site" content="@{{ settings.social_twitter_link | split: 'twitter.com/' | last }}">
+  {% endif %}
+
+{%- elsif request.page_type == 'collection' and collection -%}
+  {% assign og_description = collection.metafields.custom.seo_description | default: collection.description %}
+  {% assign seo_keywords = collection.metafields.custom.seo_keywords %}
+  {% assign og_image = collection.metafields.custom.og_image | default: collection.image %}
+  <title>{{ page_title | escape }}</title>
+  <meta name="title" content="{{ page_title | escape }}">
+  <meta name="description" content="{{ page_description | strip_html | truncate: 300 }}">
+  {% if seo_keywords %}
+    <meta name="keywords" content="{{ seo_keywords | escape }}">
+  {% endif %}
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="Kalatantu">
+  <meta property="og:url" content="{{ shop.url }}{{ collection.url }}">
+  <meta property="og:title" content="{{ page_title | escape }}">
+  <meta property="og:description" content="{{ og_description | strip_html | truncate: 300 }}">
+  <meta property="og:type" content="website">
+  {% if og_image %}
+    <meta property="og:image" content="https:{{ og_image | image_url: width: 400 }}">
+    <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 400 }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+  {% endif %}
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page_title | escape }}">
+  <meta name="twitter:description" content="{{ og_description | strip_html | truncate: 300 }}">
+  {% if og_image %}
+    <meta name="twitter:image" content="{{ og_image | image_url: width: 668 }}">
+  {% endif %}
+  {% if settings.social_twitter_link != blank %}
+    <meta name="twitter:site" content="@{{ settings.social_twitter_link | split: 'twitter.com/' | last }}">
+  {% endif %}
+
+{%- elsif request.page_type == 'blog' -%}
+   <title>Kalatantu Blog – Handweave Traditions, Banarasi Techniques & Chikankari Craft</title>
+  <!-- Meta Title -->
+  <meta name="title" content="Kalatantu Blog – Handweave Traditions, Banarasi Techniques & Chikankari Craft">
+  <!-- Meta Description -->
+  <meta name="description" content="Discover Kalatantu’s blog for insights into handweaving traditions, Banarasi techniques, Chikankari embroidery, artisan journeys, and the heritage of Indian textiles.">
+  <!-- Meta Keywords -->
+  <meta name="keywords" content="Kalatantu blog, handweave techniques, Banarasi weaving, Chikankari embroidery, artisan insights, traditional Indian textiles, GI tagged sarees, weaving culture, heritage crafts India">
+  <!-- Meta Robots -->
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Kalatantu Blog – Handweave Traditions, Banarasi Techniques & Chikankari Craft">
+  <meta property="og:description" content="Discover Kalatantu’s blog for insights into handweaving traditions, Banarasi techniques, Chikankari embroidery, artisan journeys, and the heritage of Indian textiles.">
+  <meta property="og:url" content="https://www.kalatantu.com/blogs/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://www.kalatantu.com/cdn/shop/articles/Fuzone_Bangalore_2025_Thumbnail_f18aed04-7605-41ba-98f8-ccad33ea4de6.jpg?v=1752315628&width=450">
+  <meta property="og:site_name" content="Kalatantu">
+  <meta property="og:locale" content="en_US">
+
+
+{%- else -%}
+  {% assign og_title = page_title | default: shop.name %}
+  {% assign og_url = canonical_url | default: request.origin %}
+  {% assign og_type = 'website' %}
+  {% assign og_description = page.metafields.custom.seo_og_description
+    | default: shop.description
+    | default: shop.name
+  %}
+  <!-- Meta Keywords -->
+  {% if page.metafields.custom.seo_keywords %}
+    <meta name="keywords" content="{{ page.metafields.custom.seo_keywords | escape }}">
+  {% endif %}
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="Kalatantu">
+  <meta property="og:url" content="{{ og_url }}">
+  <meta property="og:title" content="{{ og_title | escape }}">
+  <meta property="og:type" content="{{ og_type }}">
+  <meta property="og:description" content="{{ og_description | escape }}">
+  {% if page.metafields.custom.og_image %}
+    <meta property="og:image" content="https:{{ page.metafields.custom.og_image | image_url: width: 668 }}">
+    <meta property="og:image:secure_url" content="https:{{ page.metafields.custom.og_image | image_url: width: 668 }}">
+  {% endif %}
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ og_title | escape }}">
+  <meta name="twitter:description" content="{{ og_description | escape }}">
+  {% if page.metafields.custom.og_image %}
+    <meta name="twitter:image" content="{{ page.metafields.custom.og_image | image_url }}">
+  {% endif %}
+  {% if settings.social_twitter_link != blank %}
+    <meta name="twitter:site" content="@{{ settings.social_twitter_link | split: 'twitter.com/' | last }}">
+  {% endif %}
+{%- endif -%}

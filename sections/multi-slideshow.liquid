@@ -1,0 +1,147 @@
+{% schema %}
+{
+  "name": "Multi Slideshow",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image_desktop", "label": "Desktop Image" },
+        { "type": "image_picker", "id": "image_mobile", "label": "Mobile Image" },
+
+        { "type": "text", "id": "heading", "label": "Heading" },
+        { "type": "text", "id": "subheading", "label": "Subheading" },
+        { "type": "textarea", "id": "body", "label": "Body Text" },
+
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Content Alignment",
+          "options": [
+            { "value": "top-left", "label": "Top Left" },
+            { "value": "top-center", "label": "Top Center" },
+            { "value": "top-right", "label": "Top Right" },
+            { "value": "center-left", "label": "Center Left" },
+            { "value": "center-center", "label": "Center Center" },
+            { "value": "center-right", "label": "Center Right" },
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "bottom-center", "label": "Bottom Center" },
+            { "value": "bottom-right", "label": "Bottom Right" }
+          ],
+          "default": "center-center"
+        },
+
+        { "type": "url", "id": "link", "label": "Slide Link" },
+        { "type": "text", "id": "button_label", "label": "Button Label" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Multi Slideshow" }
+  ]
+}
+{% endschema %}
+
+<div class="multi-slideshow">
+  <div class="slides">
+    {% for block in section.blocks %}
+      <div class="slide" {{ block.shopify_attributes }}>
+        
+        <a href="{{ block.settings.link | default: '#' }}">
+          
+          <picture>
+            {% if block.settings.image_mobile %}
+              <source media="(max-width: 768px)" srcset="{{ block.settings.image_mobile | image_url }}">
+            {% endif %}
+            {% if block.settings.image_desktop %}
+              <img src="{{ block.settings.image_desktop | image_url }}" alt="slide">
+            {% endif %}
+          </picture>
+
+          <div class="content {{ block.settings.alignment }}">
+            {% if block.settings.subheading != blank %}
+              <p class="subheading">{{ block.settings.subheading }}</p>
+            {% endif %}
+            
+            {% if block.settings.heading != blank %}
+              <h2>{{ block.settings.heading }}</h2>
+            {% endif %}
+            
+            {% if block.settings.body != blank %}
+              <p class="body">{{ block.settings.body }}</p>
+            {% endif %}
+
+            {% if block.settings.button_label != blank %}
+              <span class="btn">{{ block.settings.button_label }}</span>
+            {% endif %}
+          </div>
+
+        </a>
+
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.multi-slideshow { position: relative; overflow: hidden; }
+.slides { display: flex; transition: 0.5s ease; }
+.slide { min-width: 100%; position: relative; }
+.slide img { width: 100%; height: auto; display: block; }
+
+/* Content */
+.content {
+  position: absolute;
+  color: #fff;
+  padding: 20px;
+  max-width: 500px;
+}
+
+/* ALIGNMENTS */
+.top-left { top: 5%; left: 5%; }
+.top-center { top: 5%; left: 50%; transform: translateX(-50%); text-align: center; }
+.top-right { top: 5%; right: 5%; text-align: right; }
+
+.center-left { top: 50%; left: 5%; transform: translateY(-50%); }
+.center-center { top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.center-right { top: 50%; right: 5%; transform: translateY(-50%); text-align: right; }
+
+.bottom-left { bottom: 5%; left: 5%; }
+.bottom-center { bottom: 5%; left: 50%; transform: translateX(-50%); text-align: center; }
+.bottom-right { bottom: 5%; right: 5%; text-align: right; }
+
+/* Typography */
+.subheading { font-size: 14px; margin-bottom: 5px; }
+h2 { font-size: 32px; margin: 5px 0; }
+.body { font-size: 16px; margin-bottom: 10px; }
+
+/* Button */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid #fff;
+  background: transparent;
+  font-size: 14px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  h2 { font-size: 22px; }
+  .body { font-size: 14px; }
+  .content { padding: 15px; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  let slides = document.querySelector(".slides");
+  let total = document.querySelectorAll(".slide").length;
+  let index = 0;
+
+  setInterval(() => {
+    index = (index + 1) % total;
+    slides.style.transform = "translateX(-" + index * 100 + "%)";
+  }, 4000);
+});
+</script>}}

@@ -1,0 +1,261 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .split-grid-wrapper {
+    padding: 0 {{ section.settings.horizontal_padding }}px;
+    margin: 0 auto;
+  }
+
+  /* Added Heading Styles */
+  .split-grid-section-title {
+    margin: 0 0 30px 0;
+    font-size: {{ section.settings.heading_size }}px;
+    text-align: {{ section.settings.heading_alignment }};
+  }
+
+  .split-grid-container {
+    display: grid;
+    gap: {{ section.settings.gap }}px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 
+      "area1 area1 area1 area2 area2"
+      "area4 area4 area3 area3 area3";
+  }
+
+  .grid-item {
+    position: relative;
+    height: {{ section.settings.desktop_height }}px;
+    overflow: hidden;
+    display: block;
+  }
+
+  /* Target the anchor tag to prevent the whole block from being underlined by base theme styles */
+  .grid-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none !important;
+  }
+
+  .grid-item:nth-child(1) { grid-area: area1; }
+  .grid-item:nth-child(2) { grid-area: area2; }
+  .grid-item:nth-child(3) { grid-area: area3; }
+  .grid-item:nth-child(4) { grid-area: area4; }
+
+  .grid-image {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* --- ADDED OVERLAY START --- */
+  .grid-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Subtle gradient from bottom-left to top-right to shadow text */
+    background: linear-gradient(15deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 100%);
+    z-index: 2;
+  }
+  /* --- ADDED OVERLAY END --- */
+
+  .grid-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Adjusted to handle spacing via padding from the bottom left corner */
+  .grid-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 32px; 
+    z-index: 3; /* Increased z-index to sit above overlay */
+  }
+
+  /* Keeps the underline strictly on the content */
+  .grid-button {
+    color: #fff;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid #fff;
+    padding-bottom: 4px;
+    display: inline-block;
+  }
+
+  @media screen and (max-width: 768px) {
+    .split-grid-section-title {
+      font-size: clamp(18px, 5vw, 24px);
+      margin-bottom: 20px;
+    }
+
+    .split-grid-container {
+      grid-template-areas: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-item {
+      grid-area: auto !important;
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+    
+    /* Slightly less padding on mobile so text doesn't get squished */
+    .grid-content {
+      padding: 20px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="section-{{ section.id }}-padding">
+  <div class="split-grid-wrapper">
+    
+    {%- if section.settings.heading != blank -%}
+      <h2 class="split-grid-section-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="split-grid-container">
+      {% for block in section.blocks limit: 4 %}
+        <div class="grid-item" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.link | default: '#' }}" class="grid-link">
+            <div class="grid-image">
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy' }}
+              {% else %}
+                {{ 'collection-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </div>
+
+            <div class="grid-content">
+              {% if block.settings.button_label != blank %}
+                <span class="grid-button">{{ block.settings.button_label }}</span>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Zig-Zag 60/40 Grid",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Featured Collections"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading Font Size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop Row Height",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between items",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "horizontal_padding",
+      "label": "Side Padding",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 0, "max": 100, "step": 4, "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 0, "max": 100, "step": 4, "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "grid_item",
+      "name": "Grid Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "VIEW MORE"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Zig-Zag 60/40 Grid",
+      "blocks": [
+        { "type": "grid_item" },
+        { "type": "grid_item" },
+        { "type": "grid_item" },
+        { "type": "grid_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
