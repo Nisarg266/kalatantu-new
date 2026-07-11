@@ -1,0 +1,100 @@
+<div class="custom-banner-section custom-banner-{{ section.id }}">
+  {% if section.settings.link != blank %}
+    <a href="{{ section.settings.link }}">
+  {% endif %}
+  
+  {% if section.settings.image_desktop != blank %}
+    <img 
+      src="{{ section.settings.image_desktop | image_url: width: 2000 }}" 
+      alt="{{ section.settings.image_desktop.alt | escape }}"
+      class="custom-banner-img custom-banner-desktop {% if section.settings.image_mobile != blank %}hide-on-mobile{% endif %}"
+      loading="lazy"
+    >
+  {% else %}
+    <div class="placeholder-wrapper {% if section.settings.image_mobile != blank %}hide-on-mobile{% endif %}">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg custom-banner-img custom-banner-desktop' }}
+    </div>
+  {% endif %}
+
+  {% if section.settings.image_mobile != blank %}
+    <img 
+      src="{{ section.settings.image_mobile | image_url: width: 800 }}" 
+      alt="{{ section.settings.image_mobile.alt | escape }}"
+      class="custom-banner-img custom-banner-mobile hide-on-desktop"
+      loading="lazy"
+    >
+  {% elsif section.settings.image_desktop == blank %}
+    <div class="placeholder-wrapper hide-on-desktop">
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg custom-banner-img custom-banner-mobile' }}
+    </div>
+  {% endif %}
+
+  {% if section.settings.link != blank %}
+    </a>
+  {% endif %}
+</div>
+
+<style>
+  .custom-banner-{{ section.id }} {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+  }
+  .custom-banner-{{ section.id }} .custom-banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+  .custom-banner-{{ section.id }} .hide-on-desktop {
+    display: none;
+  }
+  .custom-banner-{{ section.id }} .placeholder-wrapper {
+    background: #f4f4f4;
+  }
+  .custom-banner-{{ section.id }} .placeholder-svg {
+    width: 100%;
+    height: 400px;
+    display: block;
+  }
+  @media screen and (max-width: 768px) {
+    .custom-banner-{{ section.id }} .hide-on-mobile {
+      display: none;
+    }
+    .custom-banner-{{ section.id }} .hide-on-desktop {
+      display: block;
+    }
+    .custom-banner-{{ section.id }} .placeholder-svg {
+      height: 250px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Custom Full Width Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Desktop Image (Recommended: 1920x600px)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile Image (Recommended: 800x1000px)"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Banner Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Full Width Banner"
+    }
+  ]
+}
+{% endschema %}
