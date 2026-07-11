@@ -20,6 +20,56 @@
     color-scheme="{{ section.settings.color_scheme }}"
     effect="right"
   >
+    <style>
+      .hdt-mini-cart__view-checkout .hdt-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        box-sizing: border-box !important;
+      }
+      #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) {
+        margin-top: 15px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        height: 48px !important;
+        padding: 0 15px !important;
+        border: 1px solid #000 !important;
+        background-color: #fff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout):hover {
+        background-color: #fcfcfc !important;
+        opacity: 0.9 !important;
+      }
+      #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) label {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        color: #000 !important;
+        cursor: pointer !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) input[type="checkbox"] {
+        width: 16px !important;
+        height: 16px !important;
+        cursor: pointer !important;
+        accent-color: #000 !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
+      }
+    </style>
     <h3 slot="header" class="hdt-mini-cart__header-title hdt-text-2xl hdt-font-medium">
       {{ 'sections.cart.mini_cart.title' | t }}
     </h3>
@@ -200,51 +250,49 @@
                 {%- when 'line' -%}
                   <div class="hdt-mini-cart__line"></div>
                 {%- when 'bnt_cart_checkout' -%}
-                  <div
-                    class="hdt-mini-cart__view-checkout hdt-row-grid hdt-grid-cols-1{% if block.settings.enable_btn_cart and block.settings.enable_btn_checkout %} lg:hdt-grid-cols-2{% endif %}"
-                    {{ block.shopify_attributes }}
-                  >
-                    {%- if block.settings.enable_btn_cart -%}
-                      <a
-                        href="{{ routes.cart_url }}"
-                        class="hdt-mini-cart__btn-viewcart hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn hdt-oh hdt-btn-{{ block.settings.btn_style_cart }} hdt-font-{{ block.settings.btn_fw_cart }}"
-                        ><span class="hdt-truncate">{{ 'sections.cart.view_cart' | t }}</span>
-                        {%- if block.settings.btn_icon_cart == '1' -%}
-                          <svg
-                            class="hdt-icon hdt-icon-1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 64 64"
-                            fill="currentColor"
-                          >
-                            <path d="M12,56.43,36.48,32,12,7.52,19.53,0,51.61,32,19.53,64Z"/>
-                          </svg>
-                        {%- elsif block.settings.btn_icon_cart == '2' -%}
-                          <svg
-                            class="hdt-icon hdt-icon-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 64 64"
-                            fill="currentColor"
-                          >
-                            <path d="M6.89,64,0,57.11,47.26,9.85H4.92V0H64V59.08H54.15V16.74Z"/>
-                          </svg>
+                  {%- assign has_cart_form = true -%}
+                  <wrapp-hdt-cart-form class="hdt-contents" {{ block.shopify_attributes }}>
+                    <form
+                      will-change-cart
+                      action="{{ routes.cart_url }}"
+                      id="{{ form_id }}"
+                      method="POST"
+                    >
+                      <input type="hidden" name="attributes[products_items_per_row]" value="">
+                      <div
+                        class="hdt-mini-cart__view-checkout hdt-row-grid hdt-grid-cols-1{% if block.settings.enable_btn_cart and block.settings.enable_btn_checkout %} lg:hdt-grid-cols-2{% endif %}"
+                      >
+                        {%- if block.settings.enable_btn_cart -%}
+                          <a
+                            href="{{ routes.cart_url }}"
+                            class="hdt-mini-cart__btn-viewcart hdt-inline-flex hdt-align-center hdt-justify-center hdt-relative hdt-btn hdt-oh hdt-btn-{{ block.settings.btn_style_cart }} hdt-font-{{ block.settings.btn_fw_cart }}"
+                            ><span class="hdt-truncate">{{ 'sections.cart.view_cart' | t }}</span>
+                            {%- if block.settings.btn_icon_cart == '1' -%}
+                              <svg
+                                class="hdt-icon hdt-icon-1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 64 64"
+                                fill="currentColor"
+                              >
+                                <path d="M12,56.43,36.48,32,12,7.52,19.53,0,51.61,32,19.53,64Z"/>
+                              </svg>
+                            {%- elsif block.settings.btn_icon_cart == '2' -%}
+                              <svg
+                                class="hdt-icon hdt-icon-2"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 64 64"
+                                fill="currentColor"
+                              >
+                                <path d="M6.89,64,0,57.11,47.26,9.85H4.92V0H64V59.08H54.15V16.74Z"/>
+                              </svg>
+                            {%- endif -%}
+                          </a>
                         {%- endif -%}
-                      </a>
-                    {%- endif -%}
-                    {%- if block.settings.enable_btn_checkout -%}
-                      {%- assign has_cart_form = true -%}
-                      <wrapp-hdt-cart-form class="hdt-contents">
-                        <form
-                          will-change-cart
-                          action="{{ routes.cart_url }}"
-                          id="{{ form_id }}"
-                          method="POST"
-                          {{ block.shopify_attributes }}
-                        >
-                          <input type="hidden" name="attributes[products_items_per_row]" value="">
+                        {%- if block.settings.enable_btn_checkout -%}
                           <button
                             type="submit"
                             data-loading-bar
@@ -276,10 +324,10 @@
                               </svg>
                             {%- endif -%}
                           </button>
-                        </form>
-                      </wrapp-hdt-cart-form>
-                    {%- endif -%}
-                  </div>
+                        {%- endif -%}
+                      </div>
+                    </form>
+                  </wrapp-hdt-cart-form>
                 {%- when 'img_trust' -%}
                   <div class="hdt-mini-cart__imgtrust hdt-text-center">
                     {%- if block.settings.mess != blank -%}
@@ -482,6 +530,48 @@
     </symbol>
   </svg>
 {%- endif -%}
+
+<style>
+  .hdt-mini-cart__view-checkout .hdt-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) {
+    margin-top: 15px;
+    padding: 14px 15px;
+    border: 1px solid rgb(var(--color-border));
+    background-color: rgba(var(--color-background-2), 0.5);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout):hover {
+    border-color: rgb(var(--color-foreground));
+  }
+  #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) label {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgb(var(--color-foreground));
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+  }
+  #CartDrawer-Form > div:not(.hdt-mini-cart__view-checkout) input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: rgb(var(--color-foreground));
+    margin: 0;
+    flex-shrink: 0;
+  }
+</style>
 
 {% schema %}
 {
