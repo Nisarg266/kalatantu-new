@@ -17,8 +17,8 @@
         "text_EDDLG7": {
           "type": "text",
           "settings": {
-            "text1": "Dispatch in 48 hours | COD Available under 30k",
-            "text2": "5% Off on Prepaid Orders",
+            "text1": "Dispatch in 48 hours | COD Available under 20k",
+            "text2": "Sign Up & Save 10%",
             "text3": "",
             "adding_border": false,
             "au_time": 3.5,
@@ -165,9 +165,19 @@
         "sticky_type": "always",
         "sticky_glass": false
       }
+    },
+    "timer_bar": {
+      "type": "timer-bar",
+      "settings": {
+        "heading": "🔥 FLASH SALE ENDS IN:",
+        "hours_to_reset": 24,
+        "bg_color": "#8a191c",
+        "text_color": "#ffffff"
+      }
     }
   },
   "order": [
+    "timer_bar",
     "top_bar_knxwp9",
     "header"
   ]
