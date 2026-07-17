@@ -11,6 +11,15 @@
   "type": "header",
   "name": "Header Group",
   "sections": {
+    "timer_bar": {
+      "type": "timer-bar",
+      "settings": {
+        "heading": "Summer SALE ENDS IN:",
+        "hours_to_reset": 24,
+        "bg_color": "#8a191c",
+        "text_color": "#ffffff"
+      }
+    },
     "top_bar_knxwp9": {
       "type": "top-bar",
       "blocks": {
@@ -164,15 +173,6 @@
         "header_transparent_colors": "scheme-3",
         "sticky_type": "always",
         "sticky_glass": false
-      }
-    },
-    "timer_bar": {
-      "type": "timer-bar",
-      "settings": {
-        "heading": "🔥 FLASH SALE ENDS IN:",
-        "hours_to_reset": 24,
-        "bg_color": "#8a191c",
-        "text_color": "#ffffff"
       }
     }
   },
