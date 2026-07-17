@@ -128,7 +128,7 @@
     
     const hoursToReset = parseInt(timerEl.getAttribute('data-hours')) || 24;
     const durationMs = hoursToReset * 60 * 60 * 1000;
-    const storageKey = 'timer_reset_time_{{ section.id }}';
+    const storageKey = 'timer_reset_time_{{ section.id }}_' + hoursToReset;
     
     function startTimer() {
       let endTime = localStorage.getItem(storageKey);
@@ -148,7 +148,7 @@
           endTime = new Date().getTime() + durationMs;
           localStorage.setItem(storageKey, endTime);
         } else {
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const hours = Math.floor(distance / (1000 * 60 * 60));
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           
