@@ -13,6 +13,7 @@
   "sections": {
     "timer_bar": {
       "type": "timer-bar",
+      "disabled": true,
       "settings": {
         "heading": "Summer SALE ENDS IN:",
         "hours_to_reset": 24,

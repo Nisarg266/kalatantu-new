@@ -11,6 +11,7 @@
   "sections": {
     "custom_full_width_banner_Ha63Wc": {
       "type": "custom-full-width-banner",
+      "disabled": true,
       "name": "Custom Full Width Banner",
       "settings": {
         "image_desktop": "shopify://shop_images/WhatsApp_Image_2026-06-30_at_10.26.17_AM.jpg",
@@ -20,7 +21,6 @@
     },
     "custom_video_J8VNzb": {
       "type": "custom-video",
-      "disabled": true,
       "name": "Custom Video (HQ)",
       "settings": {
         "video_desktop": "shopify://files/videos/Sequence 02kt-new.mp4",
