@@ -554,6 +554,11 @@
         "type": "shopify://apps/beast-currency-converter/blocks/doubly/267afa86-a419-4d5b-a61b-556038e7294d",
         "disabled": false,
         "settings": {}
+      },
+      "3229168068650605320": {
+        "type": "shopify://apps/delightchat-whatsapp-marketing/blocks/welcome-popup/61838639-20a5-450c-957a-d2ac660a5776",
+        "disabled": true,
+        "settings": {}
       }
     },
     "color_schemes": {
