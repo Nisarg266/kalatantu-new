@@ -1,0 +1,1350 @@
+<!-- sections/festival-popup.liquid -->
+{%- liquid
+  assign is_design_mode = request.design_mode
+  assign enabled = section.settings.enable
+
+  if enabled != true and is_design_mode == false
+    # Section is disabled and not in theme editor
+  endif
+
+  # Page visibility filter
+  assign show_for_page = true
+  if section.settings.page_visibility == 'index' and request.page_type != 'index'
+    assign show_for_page = false
+  elsif section.settings.page_visibility == 'collection' and request.page_type != 'collection'
+    assign show_for_page = false
+  elsif section.settings.page_visibility == 'product' and request.page_type != 'product'
+    assign show_for_page = false
+  endif
+
+  # Image selection
+  assign img_dk = section.settings.image_desktop
+  assign img_mb = section.settings.image_mobile
+
+  assign fallback_url_dk = section.settings.image_url
+  if fallback_url_dk == blank
+    assign fallback_url_dk = 'https://cdn.shopify.com/s/files/1/0744/4774/9335/files/6e6fade9-6f36-4c73-a5a4-befa07e23e62.png?v=1791034250'
+  endif
+
+  assign fallback_url_mb = section.settings.image_url_mobile
+  if fallback_url_mb == blank
+    assign fallback_url_mb = 'https://cdn.shopify.com/s/files/1/0744/4774/9335/files/40e57f6d-22fd-4bde-bfb1-9fac01b94987.png?v=1791030301'
+  endif
+  assign image_alt = section.settings.image_alt | default: 'The Festive Edit' | escape
+  assign popup_link = section.settings.link
+  assign aspect_ratio_mobile = section.settings.aspect_ratio_mobile | default: '4_5'
+-%}
+
+{%- if enabled or is_design_mode -%}
+  {%- if show_for_page or is_design_mode -%}
+
+<style>
+  #festive-popup-{{ section.id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #festive-popup-{{ section.id }}.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Backdrop Overlay */
+  #festive-popup-{{ section.id }} .festive-popup__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ section.settings.backdrop_color | default: '#000000' }};
+    opacity: 0;
+    backdrop-filter: blur({{ section.settings.backdrop_blur | default: 8 }}px);
+    -webkit-backdrop-filter: blur({{ section.settings.backdrop_blur | default: 8 }}px);
+    transition: opacity 0.4s ease;
+  }
+
+  #festive-popup-{{ section.id }}.is-active .festive-popup__backdrop {
+    opacity: {{ section.settings.backdrop_opacity | default: 65 | divided_by: 100.0 }};
+  }
+
+  /* Modal Container */
+  #festive-popup-{{ section.id }} .festive-popup__modal {
+    position: relative;
+    width: 100%;
+    max-width: {{ section.settings.modal_width_desktop | default: 780 }}px;
+    border-radius: {{ section.settings.corner_radius | default: 16 }}px;
+    overflow: visible;
+    background: transparent;
+    z-index: 2;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Shadow Variants */
+  #festive-popup-{{ section.id }} .festive-popup__modal--shadow-gold_glow .festive-popup__media {
+    box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.85),
+                0 0 45px rgba(212, 175, 55, 0.3);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__modal--shadow-deep .festive-popup__media {
+    box-shadow: 0 30px 85px -10px rgba(0, 0, 0, 0.95),
+                0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__modal--shadow-soft .festive-popup__media {
+    box-shadow: 0 15px 40px -5px rgba(0, 0, 0, 0.45);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__modal--shadow-none .festive-popup__media {
+    box-shadow: none;
+  }
+
+  /* Animation Styles */
+  /* 1. Zoom (Default) */
+  #festive-popup-{{ section.id }}.festive-popup--anim-zoom .festive-popup__modal {
+    transform: scale(0.86);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  }
+  #festive-popup-{{ section.id }}.festive-popup--anim-zoom.is-active .festive-popup__modal {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  /* 2. Fade */
+  #festive-popup-{{ section.id }}.festive-popup--anim-fade .festive-popup__modal {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  #festive-popup-{{ section.id }}.festive-popup--anim-fade.is-active .festive-popup__modal {
+    opacity: 1;
+  }
+
+  /* 3. Slide */
+  #festive-popup-{{ section.id }}.festive-popup--anim-slide .festive-popup__modal {
+    transform: translateY(40px);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  }
+  #festive-popup-{{ section.id }}.festive-popup--anim-slide.is-active .festive-popup__modal {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Banner Media Wrapper */
+  #festive-popup-{{ section.id }} .festive-popup__banner-link,
+  #festive-popup-{{ section.id }} .festive-popup__banner-static {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    border-radius: {{ section.settings.corner_radius | default: 16 }}px;
+    outline: none;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__banner-link {
+    cursor: pointer;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__media {
+    position: relative;
+    width: 100%;
+    border-radius: {{ section.settings.corner_radius | default: 16 }}px;
+    overflow: hidden;
+    background-color: #1a0e0b;
+    line-height: 0;
+    {%- if section.settings.show_border -%}
+      border: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#000000' }};
+    {%- endif -%}
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  }
+
+  /* Desktop Media Container (Active only on Desktop >= 768px) */
+  #festive-popup-{{ section.id }} .festive-popup__media--desktop {
+    display: block;
+    {%- if section.settings.aspect_ratio == '16_9' -%}
+      aspect-ratio: 16 / 9;
+    {%- elsif section.settings.aspect_ratio == '3_2' -%}
+      aspect-ratio: 3 / 2;
+    {%- elsif section.settings.aspect_ratio == '4_3' -%}
+      aspect-ratio: 4 / 3;
+    {%- elsif section.settings.aspect_ratio == '4_5' -%}
+      aspect-ratio: 4 / 5;
+    {%- elsif section.settings.aspect_ratio == '1_1' -%}
+      aspect-ratio: 1 / 1;
+    {%- elsif section.settings.aspect_ratio == 'auto' -%}
+      aspect-ratio: auto;
+    {%- else -%}
+      aspect-ratio: 16 / 10;
+    {%- endif -%}
+  }
+
+  /* Mobile Media Container (Hidden by default on Desktop) */
+  #festive-popup-{{ section.id }} .festive-popup__media--mobile {
+    display: none;
+  }
+
+  /* Inner Frame Border (Inset Double Frame) */
+  {%- if section.settings.show_inner_border -%}
+    #festive-popup-{{ section.id }} .festive-popup__inner-border {
+      position: absolute;
+      top: {{ section.settings.inner_border_offset | default: 6 }}px;
+      left: {{ section.settings.inner_border_offset | default: 6 }}px;
+      right: {{ section.settings.inner_border_offset | default: 6 }}px;
+      bottom: {{ section.settings.inner_border_offset | default: 6 }}px;
+      border: {{ section.settings.inner_border_width | default: 1 }}px solid {{ section.settings.inner_border_color | default: '#000000' }};
+      border-radius: calc({{ section.settings.corner_radius | default: 16 }}px - {{ section.settings.inner_border_offset | default: 6 }}px);
+      pointer-events: none;
+      z-index: 3;
+      transition: border-color 0.3s ease, opacity 0.3s ease;
+    }
+  {%- endif -%}
+
+  #festive-popup-{{ section.id }} .festive-popup__banner-link:hover .festive-popup__media {
+    transform: scale(1.018);
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: inherit;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__img--desktop {
+    {%- if section.settings.aspect_ratio == 'auto' -%}
+      height: auto;
+      object-fit: contain;
+    {%- else -%}
+      object-fit: {{ section.settings.image_fit | default: 'cover' }};
+    {%- endif -%}
+    max-height: 85vh;
+    object-position: {{ section.settings.image_position | default: 'center center' }};
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__img--mobile {
+    {%- if aspect_ratio_mobile == 'auto' -%}
+      height: auto;
+      object-fit: contain;
+    {%- else -%}
+      object-fit: {{ section.settings.image_fit_mobile | default: 'cover' }};
+    {%- endif -%}
+    max-height: 82vh;
+    object-position: center center;
+  }
+
+  /* Subtle Luxury Sheen Hover Light */
+  #festive-popup-{{ section.id }} .festive-popup__sheen {
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 70%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+    transform: skewX(-22deg);
+    pointer-events: none;
+    transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__banner-link:hover .festive-popup__sheen {
+    left: 150%;
+  }
+
+  /* Close Button Base */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn {
+    position: absolute;
+    width: {{ section.settings.close_btn_size | default: 38 }}px;
+    height: {{ section.settings.close_btn_size | default: 38 }}px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 25;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    padding: 0;
+    outline: none;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn svg {
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn:hover {
+    transform: scale(1.12);
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn:hover svg {
+    transform: rotate(90deg);
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* Close Button Themes */
+  /* 1. Dark Glass (Recommended) */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--dark_glass {
+    background-color: rgba(18, 12, 10, 0.75);
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--dark_glass:hover {
+    background-color: rgba(0, 0, 0, 0.95);
+    border-color: #d4af37;
+    color: #ffd700;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  }
+
+  /* 2. Gold Luxury */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--gold {
+    background-color: #d4af37;
+    color: #120806;
+    border: 1.5px solid #fff5c0;
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.5);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--gold:hover {
+    background-color: #ffd700;
+    color: #000000;
+    box-shadow: 0 6px 22px rgba(255, 215, 0, 0.6);
+  }
+
+  /* 3. White Glass */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--light_glass {
+    background-color: rgba(255, 255, 255, 0.85);
+    color: #1a1a1a;
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--light_glass:hover {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  /* 4. Minimal */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--minimal {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+  }
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--minimal:hover {
+    color: #d4af37;
+    border-color: #d4af37;
+  }
+
+  /* Close Button Positions */
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--inside {
+    top: 14px;
+    right: 14px;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--outside {
+    top: -14px;
+    right: -14px;
+  }
+
+  #festive-popup-{{ section.id }} .festive-popup__close-btn--above {
+    top: -46px;
+    right: 0;
+  }
+
+  /* Mobile Responsiveness */
+  @media screen and (max-width: 767px) {
+    #festive-popup-{{ section.id }} {
+      padding: 14px;
+    }
+
+    #festive-popup-{{ section.id }} .festive-popup__modal {
+      max-width: {{ section.settings.modal_width_mobile | default: 340 }}px;
+    }
+
+    /* Switch: Hide Desktop, Show Mobile */
+    #festive-popup-{{ section.id }} .festive-popup__media--desktop {
+      display: none !important;
+    }
+
+    #festive-popup-{{ section.id }} .festive-popup__media--mobile {
+      display: block !important;
+      {%- if aspect_ratio_mobile == '3_4' -%}
+        aspect-ratio: 3 / 4;
+      {%- elsif aspect_ratio_mobile == '2_3' -%}
+        aspect-ratio: 2 / 3;
+      {%- elsif aspect_ratio_mobile == '1_1' -%}
+        aspect-ratio: 1 / 1;
+      {%- elsif aspect_ratio_mobile == 'auto' -%}
+        aspect-ratio: auto;
+      {%- else -%}
+        aspect-ratio: 4 / 5;
+      {%- endif -%}
+    }
+
+    /* On mobile, keep close button within screen safe bounds */
+    #festive-popup-{{ section.id }} .festive-popup__close-btn--outside,
+    #festive-popup-{{ section.id }} .festive-popup__close-btn--inside {
+      top: 10px;
+      right: 10px;
+    }
+
+    #festive-popup-{{ section.id }} .festive-popup__close-btn--above {
+      top: -42px;
+      right: 4px;
+    }
+
+    #festive-popup-{{ section.id }} .festive-popup__close-btn {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  /* Device Visibility Filter */
+  {%- if section.settings.device_visibility == 'desktop' -%}
+    @media screen and (max-width: 767px) {
+      #festive-popup-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {%- elsif section.settings.device_visibility == 'mobile' -%}
+    @media screen and (min-width: 768px) {
+      #festive-popup-{{ section.id }} {
+        display: none !important;
+      }
+    }
+  {%- endif -%}
+</style>
+
+<div
+  id="festive-popup-{{ section.id }}"
+  class="festive-popup-root festive-popup--anim-{{ section.settings.animation_style | default: 'zoom' }}"
+  data-section-id="{{ section.id }}"
+  data-trigger="{{ section.settings.trigger_type | default: 'time' }}"
+  data-delay="{{ section.settings.delay_seconds | default: 2 }}"
+  data-scroll="{{ section.settings.scroll_percentage | default: 25 }}"
+  data-frequency="{{ section.settings.frequency | default: 'days' }}"
+  data-cookie-days="{{ section.settings.cookie_days | default: 3 }}"
+  data-test-mode="{{ section.settings.test_mode }}"
+  data-close-backdrop="{{ section.settings.close_on_backdrop }}"
+  data-close-esc="{{ section.settings.close_on_esc }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ image_alt }}"
+>
+  <!-- Backdrop Overlay -->
+  <div class="festive-popup__backdrop" data-action="close"></div>
+
+  <!-- Modal Container -->
+  <div class="festive-popup__modal festive-popup__modal--pos-{{ section.settings.close_btn_position | default: 'inside' }} festive-popup__modal--shadow-{{ section.settings.shadow_style | default: 'gold_glow' }}">
+    <!-- Close Button -->
+    <button
+      type="button"
+      class="festive-popup__close-btn festive-popup__close-btn--{{ section.settings.close_btn_theme | default: 'dark_glass' }} festive-popup__close-btn--{{ section.settings.close_btn_position | default: 'inside' }}"
+      data-action="close"
+      aria-label="Close Festive Popup"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Banner Media -->
+    {%- if popup_link != blank -%}
+      <a
+        href="{{ popup_link }}"
+        class="festive-popup__banner-link"
+        {% if section.settings.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+        aria-label="{{ image_alt }}"
+      >
+        <!-- Desktop Banner (>= 768px) -->
+        <div class="festive-popup__media festive-popup__media--desktop">
+          {%- if img_dk != blank -%}
+            {{ img_dk | image_url: width: 1600 | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '700, 900, 1200, 1600',
+              class: 'festive-popup__img festive-popup__img--desktop',
+              alt: image_alt
+            }}
+          {%- elsif fallback_url_dk != blank -%}
+            <img
+              src="{{ fallback_url_dk }}"
+              class="festive-popup__img festive-popup__img--desktop"
+              alt="{{ image_alt }}"
+              width="1586"
+              height="992"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- else -%}
+            <img
+              src="{{ 'festive-popup-image.png' | asset_url }}"
+              class="festive-popup__img festive-popup__img--desktop"
+              alt="{{ image_alt }}"
+              width="1586"
+              height="992"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- endif -%}
+
+          {%- if section.settings.show_inner_border -%}
+            <div class="festive-popup__inner-border"></div>
+          {%- endif -%}
+          <div class="festive-popup__sheen"></div>
+        </div>
+
+        <!-- Mobile Banner (<= 767px) -->
+        <div class="festive-popup__media festive-popup__media--mobile">
+          {%- if img_mb != blank -%}
+            {{ img_mb | image_url: width: 900 | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '400, 600, 800, 900',
+              class: 'festive-popup__img festive-popup__img--mobile',
+              alt: image_alt
+            }}
+          {%- elsif fallback_url_mb != blank -%}
+            <img
+              src="{{ fallback_url_mb }}"
+              class="festive-popup__img festive-popup__img--mobile"
+              alt="{{ image_alt }}"
+              width="1254"
+              height="1254"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- else -%}
+            <img
+              src="{{ 'festive-popup-image-mobile.png' | asset_url }}"
+              class="festive-popup__img festive-popup__img--mobile"
+              alt="{{ image_alt }}"
+              width="1254"
+              height="1254"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- endif -%}
+
+          {%- if section.settings.show_inner_border -%}
+            <div class="festive-popup__inner-border"></div>
+          {%- endif -%}
+          <div class="festive-popup__sheen"></div>
+        </div>
+      </a>
+    {%- else -%}
+      <div class="festive-popup__banner-static">
+        <!-- Desktop Banner (>= 768px) -->
+        <div class="festive-popup__media festive-popup__media--desktop">
+          {%- if img_dk != blank -%}
+            {{ img_dk | image_url: width: 1600 | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '700, 900, 1200, 1600',
+              class: 'festive-popup__img festive-popup__img--desktop',
+              alt: image_alt
+            }}
+          {%- elsif fallback_url_dk != blank -%}
+            <img
+              src="{{ fallback_url_dk }}"
+              class="festive-popup__img festive-popup__img--desktop"
+              alt="{{ image_alt }}"
+              width="1586"
+              height="992"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- else -%}
+            <img
+              src="{{ 'festive-popup-image.png' | asset_url }}"
+              class="festive-popup__img festive-popup__img--desktop"
+              alt="{{ image_alt }}"
+              width="1586"
+              height="992"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- endif -%}
+
+          {%- if section.settings.show_inner_border -%}
+            <div class="festive-popup__inner-border"></div>
+          {%- endif -%}
+        </div>
+
+        <!-- Mobile Banner (<= 767px) -->
+        <div class="festive-popup__media festive-popup__media--mobile">
+          {%- if img_mb != blank -%}
+            {{ img_mb | image_url: width: 900 | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '400, 600, 800, 900',
+              class: 'festive-popup__img festive-popup__img--mobile',
+              alt: image_alt
+            }}
+          {%- elsif fallback_url_mb != blank -%}
+            <img
+              src="{{ fallback_url_mb }}"
+              class="festive-popup__img festive-popup__img--mobile"
+              alt="{{ image_alt }}"
+              width="1254"
+              height="1254"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- else -%}
+            <img
+              src="{{ 'festive-popup-image-mobile.png' | asset_url }}"
+              class="festive-popup__img festive-popup__img--mobile"
+              alt="{{ image_alt }}"
+              width="1254"
+              height="1254"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- endif -%}
+
+          {%- if section.settings.show_inner_border -%}
+            <div class="festive-popup__inner-border"></div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sectionId = '{{ section.id }}';
+    const popup = document.getElementById('festive-popup-' + sectionId);
+    if (!popup) return;
+
+    const trigger = popup.dataset.trigger;
+    const delaySec = parseFloat(popup.dataset.delay) || 2;
+    const scrollTarget = parseFloat(popup.dataset.scroll) || 25;
+    const frequency = popup.dataset.frequency;
+    const cookieDays = parseInt(popup.dataset.cookieDays, 10) || 3;
+    const isTestMode = popup.dataset.testMode === 'true';
+    const closeOnBackdrop = popup.dataset.closeBackdrop === 'true';
+    const closeOnEsc = popup.dataset.closeEsc === 'true';
+
+    const storageKey = 'kalatantu_festive_banner_popup_' + sectionId;
+    let isOpen = false;
+    let hasTriggered = false;
+
+    // Check if popup was recently closed
+    function shouldShow() {
+      if (isTestMode) return true;
+      if (window.Shopify && Shopify.designMode) return true;
+
+      try {
+        if (frequency === 'always') return true;
+
+        if (frequency === 'session') {
+          return sessionStorage.getItem(storageKey) !== 'seen';
+        }
+
+        if (frequency === 'days') {
+          const lastSeen = localStorage.getItem(storageKey);
+          if (!lastSeen) return true;
+          const expiryTime = parseInt(lastSeen, 10) + (cookieDays * 24 * 60 * 60 * 1000);
+          return Date.now() > expiryTime;
+        }
+      } catch (e) {
+        return true;
+      }
+      return true;
+    }
+
+    // Save frequency record
+    function markAsSeen() {
+      try {
+        if (frequency === 'session') {
+          sessionStorage.setItem(storageKey, 'seen');
+        } else if (frequency === 'days') {
+          localStorage.setItem(storageKey, Date.now().toString());
+        }
+      } catch (e) {}
+    }
+
+    // Body scroll locking helper
+    function lockScroll() {
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      if (scrollBarWidth > 0) {
+        document.body.style.paddingRight = scrollBarWidth + 'px';
+      }
+    }
+
+    function unlockScroll() {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+
+    // Open Popup
+    function openPopup() {
+      if (isOpen) return;
+      isOpen = true;
+      popup.classList.add('is-active');
+      lockScroll();
+    }
+
+    // Close Popup
+    function closePopup() {
+      if (!isOpen) return;
+      isOpen = false;
+      popup.classList.remove('is-active');
+      unlockScroll();
+      markAsSeen();
+    }
+
+    // Event Listeners for Closing
+    popup.querySelectorAll('[data-action="close"]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (el.classList.contains('festive-popup__backdrop') && !closeOnBackdrop) return;
+        e.preventDefault();
+        closePopup();
+      });
+    });
+
+    // Close on Escape Key
+    if (closeOnEsc) {
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && isOpen) {
+          closePopup();
+        }
+      });
+    }
+
+    // Triggers setup
+    if (!shouldShow()) return;
+
+    if (isTestMode) {
+      setTimeout(openPopup, 300);
+      return;
+    }
+
+    // 1. Time Delay
+    if (trigger === 'time') {
+      setTimeout(function () {
+        if (!hasTriggered) {
+          hasTriggered = true;
+          openPopup();
+        }
+      }, delaySec * 1000);
+    }
+
+    // 2. Scroll Percentage
+    else if (trigger === 'scroll') {
+      function onScroll() {
+        if (hasTriggered) return;
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (totalHeight <= 0) return;
+        const currentScroll = (window.scrollY / totalHeight) * 100;
+        if (currentScroll >= scrollTarget) {
+          hasTriggered = true;
+          window.removeEventListener('scroll', onScroll);
+          openPopup();
+        }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    // 3. Exit Intent
+    else if (trigger === 'exit') {
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      if (isMobile) {
+        setTimeout(function () {
+          if (!hasTriggered) {
+            hasTriggered = true;
+            openPopup();
+          }
+        }, 3500);
+      } else {
+        function onMouseLeave(e) {
+          if (hasTriggered) return;
+          if (e.clientY <= 10) {
+            hasTriggered = true;
+            document.removeEventListener('mouseleave', onMouseLeave);
+            openPopup();
+          }
+        }
+        document.addEventListener('mouseleave', onMouseLeave);
+      }
+    }
+
+    // Shopify Theme Customizer Live Preview Support
+    if (window.Shopify && Shopify.designMode) {
+      document.addEventListener('shopify:section:select', function (e) {
+        if (e.detail.sectionId === sectionId) {
+          openPopup();
+        }
+      });
+
+      document.addEventListener('shopify:section:deselect', function (e) {
+        if (e.detail.sectionId === sectionId && !isTestMode) {
+          closePopup();
+        }
+      });
+    }
+  })();
+</script>
+
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Festival Popup (Banner)",
+  "class": "festival-popup-section",
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["custom.system"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "⚙️ General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable",
+      "label": "Enable Festival Popup",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "test_mode",
+      "label": "Enable Test / Design Mode",
+      "default": false,
+      "info": "Always shows popup immediately on reload (ignores delay and cookies). Useful while customizing!"
+    },
+    {
+      "type": "select",
+      "id": "page_visibility",
+      "label": "Page Visibility",
+      "options": [
+        {
+          "value": "all",
+          "label": "All Pages"
+        },
+        {
+          "value": "index",
+          "label": "Homepage Only"
+        },
+        {
+          "value": "collection",
+          "label": "Collection Pages Only"
+        },
+        {
+          "value": "product",
+          "label": "Product Pages Only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "select",
+      "id": "device_visibility",
+      "label": "Device Visibility",
+      "options": [
+        {
+          "value": "all",
+          "label": "Desktop & Mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Desktop Only"
+        },
+        {
+          "value": "mobile",
+          "label": "Mobile Only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "🔗 Click Destination / Link"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Popup Click Link",
+      "info": "Choose any Collection, Product, Page, or paste any URL. When clicked, customer will be redirected here."
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open Link in New Tab",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image Alt Text",
+      "default": "The Festive Edit - Exclusive Festival Collection"
+    },
+    {
+      "type": "header",
+      "content": "🖥️ Desktop Banner Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Banner Image (Desktop)",
+      "info": "Upload custom wide banner for desktop."
+    },
+    {
+      "type": "text",
+      "id": "image_url",
+      "label": "Desktop Default Image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/6e6fade9-6f36-4c73-a5a4-befa07e23e62.png?v=1791034250"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Desktop Banner Shape / Ratio",
+      "options": [
+        {
+          "value": "16_10",
+          "label": "Wide Horizontal (16:10 - Balanced Banner)"
+        },
+        {
+          "value": "16_9",
+          "label": "Wide Horizontal (16:9 - Cinematic)"
+        },
+        {
+          "value": "3_2",
+          "label": "Wide Horizontal (3:2)"
+        },
+        {
+          "value": "4_3",
+          "label": "Wide Horizontal (4:3)"
+        },
+        {
+          "value": "1_1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "4_5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "auto",
+          "label": "Original Image Ratio"
+        }
+      ],
+      "default": "16_10"
+    },
+    {
+      "type": "range",
+      "id": "modal_width_desktop",
+      "label": "Desktop Banner Max Width",
+      "min": 450,
+      "max": 1100,
+      "step": 10,
+      "unit": "px",
+      "default": 780
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Desktop Image Fit",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover (Fill Entire Frame)"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile Banner Settings (Phone)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Banner Image (Mobile / Phone)",
+      "info": "Upload custom taller/square banner for phone."
+    },
+    {
+      "type": "text",
+      "id": "image_url_mobile",
+      "label": "Mobile Default Image URL",
+      "default": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/40e57f6d-22fd-4bde-bfb1-9fac01b94987.png?v=1791030301"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio_mobile",
+      "label": "Mobile Banner Shape / Ratio",
+      "options": [
+        {
+          "value": "4_5",
+          "label": "Portrait Rectangle (4:5 - Tall)"
+        },
+        {
+          "value": "3_4",
+          "label": "Portrait Rectangle (3:4)"
+        },
+        {
+          "value": "2_3",
+          "label": "Tall Portrait (2:3)"
+        },
+        {
+          "value": "1_1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "auto",
+          "label": "Original Image Ratio"
+        }
+      ],
+      "default": "4_5"
+    },
+    {
+      "type": "range",
+      "id": "modal_width_mobile",
+      "label": "Mobile Banner Max Width",
+      "min": 260,
+      "max": 450,
+      "step": 10,
+      "unit": "px",
+      "default": 340
+    },
+    {
+      "type": "select",
+      "id": "image_fit_mobile",
+      "label": "Mobile Image Fit",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover (Fill Entire Frame)"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "Corner Radius (Rounded Corners)",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "✨ Borders & Frame Styling"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show Outer Border",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Outer Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Outer Border Width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_inner_border",
+      "label": "Show Inner Frame Border (Double Border)",
+      "default": true,
+      "info": "Adds an elegant inset inner frame border."
+    },
+    {
+      "type": "color",
+      "id": "inner_border_color",
+      "label": "Inner Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "inner_border_offset",
+      "label": "Space / Gap Between Borders",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "inner_border_width",
+      "label": "Inner Border Width",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "shadow_style",
+      "label": "Drop Shadow & Glow Effect",
+      "options": [
+        {
+          "value": "gold_glow",
+          "label": "✨ Golden Ambient Glow"
+        },
+        {
+          "value": "deep",
+          "label": "🎬 Deep Cinematic Shadow"
+        },
+        {
+          "value": "soft",
+          "label": "☁️ Soft Modern Shadow"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "gold_glow"
+    },
+    {
+      "type": "select",
+      "id": "animation_style",
+      "label": "Popup Entrance Animation",
+      "options": [
+        {
+          "value": "zoom",
+          "label": "Smooth Zoom In"
+        },
+        {
+          "value": "fade",
+          "label": "Elegant Fade In"
+        },
+        {
+          "value": "slide",
+          "label": "Slide Up From Bottom"
+        }
+      ],
+      "default": "zoom"
+    },
+    {
+      "type": "header",
+      "content": "✕ Close Button"
+    },
+    {
+      "type": "select",
+      "id": "close_btn_position",
+      "label": "Close Button Position",
+      "options": [
+        {
+          "value": "inside",
+          "label": "Inside Top-Right (Clean & Safe)"
+        },
+        {
+          "value": "outside",
+          "label": "Floating Outside Top-Right"
+        },
+        {
+          "value": "above",
+          "label": "Above Banner"
+        }
+      ],
+      "default": "inside"
+    },
+    {
+      "type": "select",
+      "id": "close_btn_theme",
+      "label": "Close Button Style",
+      "options": [
+        {
+          "value": "dark_glass",
+          "label": "Dark Glassmorphism (Recommended)"
+        },
+        {
+          "value": "gold",
+          "label": "Gold & Dark Luxury"
+        },
+        {
+          "value": "light_glass",
+          "label": "Light Glassmorphism"
+        },
+        {
+          "value": "minimal",
+          "label": "Minimalist"
+        }
+      ],
+      "default": "dark_glass"
+    },
+    {
+      "type": "range",
+      "id": "close_btn_size",
+      "label": "Close Button Size",
+      "min": 32,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "checkbox",
+      "id": "close_on_backdrop",
+      "label": "Close When Clicking Outside Background",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "close_on_esc",
+      "label": "Close When Pressing ESC Key",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "⏱️ Trigger & Frequency"
+    },
+    {
+      "type": "select",
+      "id": "trigger_type",
+      "label": "Trigger Type",
+      "options": [
+        {
+          "value": "time",
+          "label": "Time Delay"
+        },
+        {
+          "value": "scroll",
+          "label": "Scroll Percentage"
+        },
+        {
+          "value": "exit",
+          "label": "Exit Intent (Desktop) / Delay (Mobile)"
+        }
+      ],
+      "default": "time"
+    },
+    {
+      "type": "range",
+      "id": "delay_seconds",
+      "label": "Time Delay (Seconds)",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "unit": "s",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "scroll_percentage",
+      "label": "Scroll Percentage Trigger",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "select",
+      "id": "frequency",
+      "label": "Display Frequency",
+      "options": [
+        {
+          "value": "always",
+          "label": "Every Page Load (Always)"
+        },
+        {
+          "value": "session",
+          "label": "Once Per Browser Session"
+        },
+        {
+          "value": "days",
+          "label": "Wait X Days Before Showing Again"
+        }
+      ],
+      "default": "days"
+    },
+    {
+      "type": "range",
+      "id": "cookie_days",
+      "label": "Days to Wait Before Re-showing",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "day",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "🎨 Backdrop Overlay"
+    },
+    {
+      "type": "color",
+      "id": "backdrop_color",
+      "label": "Backdrop Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "backdrop_opacity",
+      "label": "Backdrop Darkness",
+      "min": 20,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 65
+    },
+    {
+      "type": "range",
+      "id": "backdrop_blur",
+      "label": "Backdrop Blur Effect",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Festival Popup (The Festive Edit)"
+    }
+  ]
+}
+{% endschema %}
