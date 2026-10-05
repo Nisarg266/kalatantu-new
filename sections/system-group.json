@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "name": "t:sections.name_group.system",
   "type": "custom.system",
@@ -262,21 +271,23 @@
     },
     "festival_popup": {
       "type": "festival-popup",
+      "disabled": true,
       "settings": {
         "enable": true,
         "test_mode": false,
         "page_visibility": "all",
         "device_visibility": "all",
-        "image_url": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/6e6fade9-6f36-4c73-a5a4-befa07e23e62.png?v=1791034250",
-        "image_url_mobile": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/40e57f6d-22fd-4bde-bfb1-9fac01b94987.png?v=1791030301",
-        "image_alt": "The Festive Edit - Exclusive Festival Collection",
         "link": "",
         "open_in_new_tab": false,
+        "image_alt": "The Festive Edit - Exclusive Festival Collection",
+        "image_url": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/6e6fade9-6f36-4c73-a5a4-befa07e23e62.png?v=1791034250",
         "aspect_ratio": "16_10",
-        "aspect_ratio_mobile": "4_5",
-        "image_fit": "cover",
         "modal_width_desktop": 780,
+        "image_fit": "cover",
+        "image_url_mobile": "https://cdn.shopify.com/s/files/1/0744/4774/9335/files/40e57f6d-22fd-4bde-bfb1-9fac01b94987.png?v=1791030301",
+        "aspect_ratio_mobile": "4_5",
         "modal_width_mobile": 340,
+        "image_fit_mobile": "cover",
         "corner_radius": 16,
         "show_border": true,
         "border_color": "#000000",
